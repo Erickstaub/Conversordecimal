@@ -1,0 +1,44 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<h2>Modo Desafio</h2>
+
+<div class="desafio-box">
+    <p>Converta:</p>
+
+    <h3>
+        {{ desafio.valor }} ({{ desafio.origem }}) → {{ desafio.destino }}
+    </h3>
+
+    <form method="post">
+        {% csrf_token %}
+        <input type="text" name="resposta" placeholder="Sua resposta">
+        <button type="submit">Responder</button>
+    </form>
+</div>
+
+{% if feedback %}
+    <div class="feedback {% if feedback.acertou %}certo{% else %}errado{% endif %}">
+        {% if feedback.acertou %}
+            ✅ Acertou!
+        {% else %}
+            ❌ Errou — correto: {{ feedback.correto }}
+        {% endif %}
+    </div>
+{% endif %}
+
+<hr>
+
+<h3>Histórico</h3>
+
+<div class="historico-grid">
+    {% for item in historico %}
+        <div class="card {% if item.acertou %}ok{% else %}erro{% endif %}">
+            <p>{{ item.valor }} ({{ item.base_origem }}) → {{ item.base_destino }}</p>
+            <p>Sua resposta: {{ item.resposta_usuario }}</p>
+            <p>Correto: {{ item.resposta_correta }}</p>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<h2>Conversor</h2>
+
+<form method="post" class="converter-form">
+    {% csrf_token %}
+    
+    <div class="converter-grid">
+
+        <!-- ENTRADA -->
+        <div class="box">
+            <label>Entrada</label>
+            <input type="text" name="valor" placeholder="Digite o número">
+
+            <select name="origem">
+                <option value="dec">Decimal</option>
+                <option value="bin">Binário</option>
+                <option value="hex">Hexadecimal</option>
+                <option value="oct">Octal</option>
+            </select>
+        </div>
+
+        <!-- SETA -->
+        <div class="arrow">
+            →
+        </div>
+
+        <!-- SAÍDA -->
+        <div class="box">
+            <label>Saída</label>
+
+            <select name="destino">
+                <option value="dec">Decimal</option>
+                <option value="bin">Binário</option>
+                <option value="hex">Hexadecimal</option>
+                <option value="oct">Octal</option>
+            </select>
+
+            {% if resultado %}
+                <div class="resultado-inline">
+                    {{ resultado }}
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <button type="submit">Converter</button>
+</form>
+
+{% if resultado %}
+<div class="resultado-box">
+    Resultado: {{ resultado }}
+</div>
+{% endif %}
+
+<hr>
+
+<h3>Seu Histórico</h3>
+
+
+<div class="historico-grid">
+    {% for item in historico %}
+        <div class="card">
+
+            <div class="card-top">
+                <span class="badge origem">{{ item.base_origem }}</span>
+                <span class="arrow">→</span>
+                <span class="badge destino">{{ item.base_destino }}</span>
+            </div>
+
+            <div class="card-body">
+                <div class="valor">{{ item.valor_entrada }}</div>
+                <div class="resultado">{{ item.resultado }}</div>
+            </div>
+
+            <div class="card-footer">
+                <small>{{ item.criado_em }}</small>
+            </div>
+
+        </div>
+    {% empty %}
+        <p>Nenhuma conversão ainda.</p>
+    {% endfor %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <title>{% block title %}Base{% endblock %}</title>
+
+</head>
+<body>
+
+    <!-- NAVBAR SUPERIOR -->
+    <header class="topbar">
+        <div class="logo">
+            <h1>Conversor</h1>
+        </div>
+
+        <div class="user-info">
+            {% if request.user.is_authenticated %}
+                <span>{{ request.user.username }}</span>
+<form method="post" action="{% url 'logout' %}" class="logout-form">
+    {% csrf_token %}
+    <button type="submit" class="logout-btn">Sair</button>
+</form>
+            {% else %}
+                <a href="{% url 'login' %}">Entrar</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <div class="layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <nav>
+                <ul>
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    <li><a href="{% url 'desafio' %}">Desafio</a></li>
+                    
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- CONTEÚDO -->
+        <main class="content">
+            {% block content %}
+            {% endblock %}
+        </main>
+
+    </div>
+
+</body>
+</html>
