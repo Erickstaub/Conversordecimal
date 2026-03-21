@@ -24,3 +24,13 @@ class Desafio(models.Model):
     resposta_correta = models.CharField(max_length=100)
     acertou = models.BooleanField()
     criado_em = models.DateTimeField(auto_now_add=True)
+
+
+class Pontuacao(models.Model):
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE)
+    pontos = models.IntegerField(default=0)
+    desafios_respondidos = models.IntegerField(default=0)
+    desafios_corretos = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.usuario.username} - {self.pontos} pts"

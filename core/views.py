@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
-from .models import Conversao, Desafio
+from .models import Conversao, Desafio, Pontuacao
 import random
 
 
@@ -64,17 +64,19 @@ def gerar_desafio():
 
 @login_required
 def home(request):
-    resultado = None
     erro = None
+
+    # 👇 pega resultado da session (se existir)
+    resultado = request.session.pop('resultado', None)
 
     if request.method == 'POST':
         valor = request.POST.get('valor')
         origem = request.POST.get('origem')
         destino = request.POST.get('destino')
 
-        resultado = converter_valor(valor, origem, destino)
+        resultado_calc = converter_valor(valor, origem, destino)
 
-        if resultado is None:
+        if resultado_calc is None:
             erro = "Valor inválido para a base selecionada"
         else:
             Conversao.objects.create(
@@ -82,10 +84,12 @@ def home(request):
                 valor_entrada=valor,
                 base_origem=origem,
                 base_destino=destino,
-                resultado=resultado
+                resultado=resultado_calc
             )
 
-            # 🔥 evita duplicação no F5
+            # 🔥 salva temporariamente
+            request.session['resultado'] = resultado_calc
+
             return redirect('home')
 
     historico = Conversao.objects.filter(
@@ -111,6 +115,9 @@ def desafio(request):
     desafio_atual = request.session['desafio']
     feedback = None
 
+    # 🔥 garante que o usuário tem pontuação
+    pontuacao, _ = Pontuacao.objects.get_or_create(usuario=request.user)
+
     if request.method == 'POST':
         resposta = request.POST.get('resposta', '').strip().lower()
 
@@ -122,7 +129,7 @@ def desafio(request):
 
         acertou = resposta == (correto or "").lower()
 
-        # salva no banco
+        # salva desafio
         Desafio.objects.create(
             usuario=request.user,
             valor=desafio_atual['valor'],
@@ -133,12 +140,23 @@ def desafio(request):
             acertou=acertou
         )
 
+        # ========================
+        # 🏆 SISTEMA DE PONTUAÇÃO
+        # ========================
+        pontuacao.desafios_respondidos += 1
+
+        if acertou:
+            pontuacao.desafios_corretos += 1
+            pontuacao.pontos += 10
+
+        pontuacao.save()
+
         feedback = {
             'acertou': acertou,
             'correto': correto
         }
 
-        # ✅ SÓ GERA NOVO SE ACERTAR
+        # só gera novo desafio se acertar
         if acertou:
             request.session['desafio'] = gerar_desafio()
 
@@ -151,7 +169,21 @@ def desafio(request):
     return render(request, 'core/desafio.html', {
         'desafio': desafio_atual,
         'feedback': feedback,
-        'historico': historico
+        'historico': historico,
+        'pontuacao': pontuacao
+    })
+
+
+# ========================
+# 🏆 LEADERBOARD
+# ========================
+
+@login_required
+def leaderboard(request):
+    ranking = Pontuacao.objects.select_related('usuario').order_by('-pontos')[:20]
+
+    return render(request, 'core/top.html', {
+        'ranking': ranking
     })
 
 
@@ -165,8 +197,12 @@ def register(request):
 
         if form.is_valid():
             user = form.save()
-            login(request, user)  # 🔥 já loga direto
-            return redirect('home')
+            login(request, user)
+
+            # 🔥 cria pontuação automaticamente
+            Pontuacao.objects.create(usuario=user)
+
+         
     else:
         form = UserCreationForm()
 

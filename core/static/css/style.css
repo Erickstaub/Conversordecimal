@@ -291,3 +291,69 @@ form button {
 .auth-link:hover {
     text-decoration: underline;
 }
+.leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background: #121212;
+    border: 1px solid #222;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Cabeçalho */
+.leaderboard-table th {
+    background: #151515;
+    color: #888;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: left;
+    padding: 12px;
+    border-bottom: 1px solid #222;
+}
+
+/* Linhas */
+.leaderboard-table td {
+    padding: 12px;
+    border-bottom: 1px solid #1f1f1f;
+    font-size: 14px;
+}
+
+/* Hover */
+.leaderboard-table tr:hover {
+    background: #1a1a1a;
+}
+
+/* Top 3 destaque */
+.leaderboard-table tr:nth-child(1) td {
+    color: #ffd700; /* ouro */
+    font-weight: bold;
+}
+
+.leaderboard-table tr:nth-child(2) td {
+    color: #c0c0c0; /* prata */
+}
+
+.leaderboard-table tr:nth-child(3) td {
+    color: #cd7f32; /* bronze */
+}
+
+/* Rank número */
+.rank {
+    font-weight: bold;
+    color: #4f9cff;
+}
+
+/* Pontuação destaque */
+.pontos {
+    color: #4f9cff;
+    font-weight: bold;
+}
+
+/* Container opcional */
+.leaderboard-container {
+    background: #151515;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #222;
+}

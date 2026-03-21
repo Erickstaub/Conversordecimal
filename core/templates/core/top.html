@@ -1,0 +1,29 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container">
+
+    <h2>🏆 Leaderboard</h2>
+
+   <div class="leaderboard-container">
+<table class="leaderboard-table">
+        <tr>
+            <th>#</th>
+            <th>Usuário</th>
+            <th>Pontos</th>
+            <th>Acertos</th>
+        </tr>
+
+        {% for user in ranking %}
+<tr>
+    <td class="rank">{{ forloop.counter }}</td>
+    <td>{{ user.usuario.username }}</td>
+    <td class="pontos">{{ user.pontos }}</td>
+    <td>{{ user.desafios_corretos }}</td>
+</tr>
+        {% endfor %}
+ </table>
+</div>
+
+</div>
+{% endblock %}
